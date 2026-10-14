@@ -24,6 +24,10 @@ function Invoke-Checked {
     if ($LASTEXITCODE -ne 0) { throw "$($args -join ' ') failed with exit code $LASTEXITCODE" }
 }
 
+# Cargo counts the staged (git-ignored) libraries as dirty, so publishing needs --allow-dirty;
+# check here instead that nothing else is uncommitted.
+if (-not $DryRun -and (git status --porcelain)) { throw 'Commit or stash your changes first.' }
+
 if (-not $SkipFetch) { & "$PSScriptRoot/fetch-natives.ps1" -Destination natives }
 foreach ($rid in 'win-x64', 'linux-x64', 'linux-arm64', 'osx-arm64') {
     $library = Get-ChildItem "natives/$rid" -File | Where-Object Extension -ne '.asc'
@@ -49,4 +53,4 @@ if ($DryRun) {
     Write-Host 'Dry run: packaged and verified 5 crates, nothing published.'
     return
 }
-Invoke-Checked cargo publish --workspace --locked
+Invoke-Checked cargo publish --workspace --locked --allow-dirty

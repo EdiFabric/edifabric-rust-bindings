@@ -17,6 +17,13 @@ for arg in "$@"; do
     esac
 done
 
+# Cargo counts the staged (git-ignored) libraries as dirty, so publishing needs --allow-dirty;
+# check here instead that nothing else is uncommitted.
+if ! $dry_run && [ -n "$(git status --porcelain)" ]; then
+    echo "Commit or stash your changes first." >&2
+    exit 1
+fi
+
 $skip_fetch || bash scripts/fetch-natives.sh natives
 bash scripts/stage-natives.sh
 
@@ -31,4 +38,4 @@ if $dry_run; then
     echo "Dry run: packaged and verified 5 crates, nothing published."
     exit 0
 fi
-cargo publish --workspace --locked
+cargo publish --workspace --locked --allow-dirty
