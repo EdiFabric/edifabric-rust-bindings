@@ -14,12 +14,32 @@ The library is loaded at runtime, so nothing is linked at build time.
 | `src/lib.rs` | bindings for the complete C ABI (crate `edifabric-x12`) |
 | `examples/example_all_functions.rs` | runnable walkthrough of every entry point |
 | `c-abi-edifabric_x12_tools.h` | the C header these bindings mirror |
+| `native/` | the crates that bundle the native library for each platform |
+| `PUBLISHING.md` | how the crates are built and published to crates.io |
+
+## Install
+
+```bash
+cargo add edifabric-x12
+```
+
+The default `bundled` feature embeds the ediFabric Native library for your target in
+the compiled program: Windows x64, Linux x64 and arm64 (glibc 2.34 or later), or macOS
+arm64 (12 or later). On first use it is written to the temp folder under
+`edifabric-x12/` and loaded from there. A library you pass to `load_library`, set in
+`EDIFABRIC_X12_LIB`, or put beside the executable or in the working directory takes
+precedence over the bundled one. To ship the library yourself and keep about 8 MB out
+of the program, turn the feature off:
+
+```toml
+edifabric-x12 = { version = "1.1.1", default-features = false }
+```
 
 ## Requirements
 
-- Rust 1.85 or later (edition 2024)
+- Rust 1.88 or later (edition 2024)
 - 64-bit Windows, Linux, or macOS
-- The native library for your platform:
+- The native library for your platform (embedded by the crates.io crate; download it when you run from a clone):
 
 | Platform | File |
 | --- | --- |
@@ -65,7 +85,8 @@ cargo run --example example_all_functions -- --lib /opt/edifabric   # library fi
 You can also set `EDIFABRIC_SERIAL` instead of passing `--serial`.
 
 The library path is resolved from `--lib`, then `EDIFABRIC_X12_LIB`, then the
-executable's folder, the working directory, and its parent. The serial comes from
+executable's folder, the working directory, its parent, and finally the bundled
+library. The serial comes from
 `--serial`, then `EDIFABRIC_SERIAL`.
 
 All strings and payloads cross the boundary as **UTF‑8 byte buffers**
@@ -78,7 +99,7 @@ Add the crate to your project:
 
 ```toml
 [dependencies]
-edifabric-x12 = { git = "https://github.com/EdiFabric/edifabric-rust-bindings" }
+edifabric-x12 = "1.1.1"
 ```
 
 ```rust

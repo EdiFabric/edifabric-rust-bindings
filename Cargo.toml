@@ -1,17 +1,51 @@
-[package]
-name = "edifabric-x12"
-version = "1.0.0"
+[workspace]
+members = ["native/*"]
+
+[workspace.package]
+version = "1.1.1"
 edition = "2024"
-rust-version = "1.85"
-description = "Rust bindings for ediFabric Native X12: convert X12 EDI to JSON and back, validate, and generate acknowledgments."
+rust-version = "1.88"
 homepage = "https://www.edifabric.com/edifabric-native.html"
 repository = "https://github.com/EdiFabric/edifabric-rust-bindings"
+
+[package]
+name = "edifabric-x12"
+description = "Rust bindings for ediFabric Native X12: convert X12 EDI to JSON and back, validate, and generate acknowledgments."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license-file = "LICENSE.md"
 readme = "README.md"
 keywords = ["edifabric", "x12", "edi", "hipaa", "ffi"]
-exclude = ["*.dll", "*.so", "*.dylib", "*.log", "*.png"]
+categories = ["api-bindings", "parser-implementations"]
+exclude = ["*.dll", "*.so", "*.dylib", "*.log", "*.png", "/natives", "/native", "/scripts", "/.github"]
+
+[features]
+default = ["bundled"]
+# Embed the library for the target platform and load it when no other copy is found.
+bundled = [
+    "dep:edifabric-x12-native-win-x64",
+    "dep:edifabric-x12-native-linux-x64",
+    "dep:edifabric-x12-native-linux-arm64",
+    "dep:edifabric-x12-native-osx-arm64",
+]
 
 [dependencies]
 libloading = "0.9.0"
+
+[target.'cfg(all(windows, target_arch = "x86_64"))'.dependencies]
+edifabric-x12-native-win-x64 = { version = "=1.1.1", path = "native/win-x64", optional = true }
+
+[target.'cfg(all(target_os = "linux", target_env = "gnu", target_arch = "x86_64"))'.dependencies]
+edifabric-x12-native-linux-x64 = { version = "=1.1.1", path = "native/linux-x64", optional = true }
+
+[target.'cfg(all(target_os = "linux", target_env = "gnu", target_arch = "aarch64"))'.dependencies]
+edifabric-x12-native-linux-arm64 = { version = "=1.1.1", path = "native/linux-arm64", optional = true }
+
+[target.'cfg(all(target_os = "macos", target_arch = "aarch64"))'.dependencies]
+edifabric-x12-native-osx-arm64 = { version = "=1.1.1", path = "native/osx-arm64", optional = true }
 
 [dev-dependencies]
 serde_json = "1.0.154"

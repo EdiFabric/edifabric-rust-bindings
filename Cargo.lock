@@ -10,11 +10,31 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "edifabric-x12"
-version = "1.0.0"
+version = "1.1.1"
 dependencies = [
+ "edifabric-x12-native-linux-arm64",
+ "edifabric-x12-native-linux-x64",
+ "edifabric-x12-native-osx-arm64",
+ "edifabric-x12-native-win-x64",
  "libloading",
  "serde_json",
 ]
+
+[[package]]
+name = "edifabric-x12-native-linux-arm64"
+version = "1.1.1"
+
+[[package]]
+name = "edifabric-x12-native-linux-x64"
+version = "1.1.1"
+
+[[package]]
+name = "edifabric-x12-native-osx-arm64"
+version = "1.1.1"
+
+[[package]]
+name = "edifabric-x12-native-win-x64"
+version = "1.1.1"
 
 [[package]]
 name = "itoa"

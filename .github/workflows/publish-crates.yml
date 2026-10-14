@@ -1,0 +1,75 @@
+name: Publish to crates.io
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to crates.io (otherwise package, verify, and smoke-test only)
+        type: boolean
+        default: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the release tag matches the version
+        if: github.event_name == 'release'
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "edifabric-x12") | .version')
+          test "${GITHUB_REF_NAME#v}" = "$version" || { echo "Tag $GITHUB_REF_NAME does not match version $version"; exit 1; }
+      - run: bash scripts/fetch-natives.sh natives
+      - run: bash scripts/stage-natives.sh
+      - run: cargo publish --workspace --locked --dry-run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: natives
+          path: natives
+          if-no-files-found: error
+
+  smoke-test:
+    needs: package
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: natives
+          path: natives
+      - run: bash scripts/stage-natives.sh
+      - name: Load the bundled library from a folder without one
+        run: |
+          manifest="$PWD/scripts/smoke-test/Cargo.toml"
+          mkdir "$RUNNER_TEMP/smoke" && cd "$RUNNER_TEMP/smoke"
+          cargo run --quiet --manifest-path "$manifest"
+
+  publish:
+    needs: smoke-test
+    if: github.event_name == 'release' || inputs.publish
+    runs-on: ubuntu-latest
+    environment: crates-io
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: natives
+          path: natives
+      - run: bash scripts/stage-natives.sh
+      # Trusted publishing; works once every crate exists and has this workflow as a trusted publisher.
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+        if: ${{ !vars.USE_CARGO_TOKEN }}
+      - run: cargo publish --workspace --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}

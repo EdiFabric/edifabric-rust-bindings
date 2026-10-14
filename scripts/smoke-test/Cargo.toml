@@ -1,0 +1,11 @@
+[package]
+name = "edifabric-x12-smoke-test"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Not part of the bindings' workspace: this crate consumes edifabric-x12 like a user would.
+[workspace]
+
+[dependencies]
+edifabric-x12 = { path = "../.." }

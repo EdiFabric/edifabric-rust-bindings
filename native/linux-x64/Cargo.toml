@@ -1,0 +1,12 @@
+[package]
+name = "edifabric-x12-native-linux-x64"
+description = "The ediFabric Native X12 library for Linux x64 (glibc 2.34+), bundled by the edifabric-x12 crate."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license-file = "../../LICENSE.md"
+readme = "../README.md"
+keywords = ["edifabric", "x12", "edi"]
+include = ["Cargo.toml", "build.rs", "src/lib.rs", "edifabric-x12-tools.so"]

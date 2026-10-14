@@ -260,7 +260,8 @@ fn bind(path: &Path) -> Result<Native> {
 ///
 /// `path` may be the library file or the folder containing it. When `None`, the
 /// `EDIFABRIC_X12_LIB` variable, the executable's folder, the working directory,
-/// and its parent are tried in that order. Cached after the first success; every
+/// and its parent are tried in that order, then the library embedded by the
+/// default `bundled` feature. Cached after the first success; every
 /// wrapper calls this with `None` on first use.
 pub fn load_library(path: Option<&Path>) -> Result<PathBuf> {
     load(path).map(|native| native.path.clone())
@@ -286,7 +287,18 @@ fn load(path: Option<&Path>) -> Result<Arc<Native>> {
             Err(error) => last_error = Some(error),
         }
     }
-    let tried: Vec<String> = tried.iter().map(|p| p.display().to_string()).collect();
+    let mut tried: Vec<String> = tried.iter().map(|p| p.display().to_string()).collect();
+    if let Some(data) = bundled_library() {
+        tried.push("the bundled library".to_string());
+        match extract_bundled(data).and_then(|file| bind(&file)) {
+            Ok(native) => {
+                let native = Arc::new(native);
+                *current = Some(Arc::clone(&native));
+                return Ok(native);
+            }
+            Err(error) => last_error = Some(error),
+        }
+    }
     Err(Error::Load(format!(
         "could not load {}. Tried: {}. Last error: {}",
         library_filename(),
@@ -297,6 +309,47 @@ fn load(path: Option<&Path>) -> Result<Arc<Native>> {
 
 fn native() -> Result<Arc<Native>> {
     load(None)
+}
+
+/// The library embedded by the `bundled` feature for the target platform, if any.
+fn bundled_library() -> Option<&'static [u8]> {
+    #[cfg(all(feature = "bundled", windows, target_arch = "x86_64"))]
+    return edifabric_x12_native_win_x64::LIBRARY;
+    #[cfg(all(feature = "bundled", target_os = "linux", target_env = "gnu", target_arch = "x86_64"))]
+    return edifabric_x12_native_linux_x64::LIBRARY;
+    #[cfg(all(feature = "bundled", target_os = "linux", target_env = "gnu", target_arch = "aarch64"))]
+    return edifabric_x12_native_linux_arm64::LIBRARY;
+    #[cfg(all(feature = "bundled", target_os = "macos", target_arch = "aarch64"))]
+    return edifabric_x12_native_osx_arm64::LIBRARY;
+    #[allow(unreachable_code)]
+    None
+}
+
+/// Writes the embedded library to `<temp>/edifabric-x12/<version>-<hash>/`, because the OS
+/// can only load it from a file. Later runs reuse the copy.
+fn extract_bundled(data: &[u8]) -> Result<PathBuf> {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    data.hash(&mut hasher);
+    let dir = std::env::temp_dir()
+        .join("edifabric-x12")
+        .join(format!("{}-{:016x}", env!("CARGO_PKG_VERSION"), hasher.finish()));
+    let target = dir.join(library_filename());
+    if std::fs::metadata(&target).is_ok_and(|m| m.len() == data.len() as u64) {
+        return Ok(target);
+    }
+    let io_error = |e: std::io::Error| Error::Load(format!("cannot extract the bundled library to {}: {e}", dir.display()));
+    std::fs::create_dir_all(&dir).map_err(io_error)?;
+    let partial = dir.join(format!("{}.{}.part", library_filename(), std::process::id()));
+    std::fs::write(&partial, data).map_err(io_error)?;
+    if let Err(error) = std::fs::rename(&partial, &target) {
+        let _ = std::fs::remove_file(&partial);
+        // Another process may have extracted (and on Windows locked) the same file.
+        if !std::fs::metadata(&target).is_ok_and(|m| m.len() == data.len() as u64) {
+            return Err(io_error(error));
+        }
+    }
+    Ok(target)
 }
 
 // ---------------------------------------------------------------------------
