@@ -47,7 +47,7 @@ edifabric-x12 = { version = "1.1.1", default-features = false }
 | Linux | `edifabric-x12-tools.so` |
 | macOS | `edifabric-x12-tools.dylib` |
 
-1. [Sign up free for **Community**](https://www.edifabric.com/pricing.html) to get an evaluation serial key. Community never expires, requires no credit card, and is for non-production use. The first 14 days after you subscribe have unlimited operations, then the quota is 250 per day. To extend the unlimited period, ask through the [support portal](https://support.edifabric.com/hc/en-us/requests/new) or at [support@edifabric.com](mailto:support@edifabric.com). After signup, retrieve your serial from [Your Account](https://www.edifabric.com/docs/getting-started/your-account.html).
+1. Evaluate with the demo serial key `bd96a836feca45cb91c86ee65d281f52` without creating an account. It works for ediFabric Native, .NET and Cloud, and has a limited quota. Once it runs out, [sign up free for **Community**](https://www.edifabric.com/pricing.html) to get your own evaluation serial key. Community never expires, requires no credit card, and is for non-production use. The first 14 days after you subscribe have unlimited operations, then the quota is 250 per day. To extend the unlimited period, ask through the [support portal](https://support.edifabric.com/hc/en-us/requests/new) or at [support@edifabric.com](mailto:support@edifabric.com). After signup, retrieve your serial from [Your Account](https://www.edifabric.com/docs/getting-started/your-account.html).
 2. [Download the **ediFabric Native** library](https://www.edifabric.com/docs/edifabric-native/download.html).
 
 Plus your **model files** (per transaction set) and a **map file** that tells the
@@ -55,13 +55,14 @@ engine where to find them. See [Model map](#model-map) for details.
 
 ## Getting started
 
-**Sign up free for Community** at [edifabric.com/pricing](https://www.edifabric.com/pricing.html)
-to get an evaluation serial key, then **download the library** from
+Use the demo serial key `bd96a836feca45cb91c86ee65d281f52`, which needs no account, or **sign up free for Community** at
+[edifabric.com/pricing](https://www.edifabric.com/pricing.html) to get your own evaluation serial key.
+Then **download the library** from
 [here](https://www.edifabric.com/docs/edifabric-native/download.html).
 Put the native library in the crate root, then run the walkthrough from there with your serial:
 
 ```bash
-cargo run --example example_all_functions -- --serial YOUR_SERIAL
+cargo run --example example_all_functions -- --serial bd96a836feca45cb91c86ee65d281f52
 ```
 
 It authorizes with your Community (or paid) serial, loads the model map, and
@@ -231,8 +232,13 @@ back to the C runtime `free`.
 ## Licensing
 
 > [!NOTE]
+> You can evaluate with the demo serial key `bd96a836feca45cb91c86ee65d281f52`
+> without creating an account. It works for ediFabric Native, .NET and Cloud. Once the limited
+> quota for this provisional key runs out, an account and a Community subscription are required
+> to continue the evaluation.
+>
 > Sign up free for the [Community plan](https://www.edifabric.com/pricing.html)
-> to get an evaluation serial key. Community never expires, requires no credit
+> to get your own evaluation serial key. Community never expires, requires no credit
 > card, and is for non-production evaluation, learning, and prototyping
 > (unlimited operations for the first 14 days after you subscribe, then 250 per day;
 > to extend the unlimited period, ask through the [support portal](https://support.edifabric.com/hc/en-us/requests/new)
