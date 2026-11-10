@@ -51,12 +51,12 @@ warning and bundles nothing; the release scripts and workflow always stage the l
 
 1. Upload the new native build to `https://www.edifabric.com/download/`.
 2. In `Cargo.toml`, set `workspace.package.version` and the four `=x.y.z` platform dependency
-   versions to the native library version, for example `1.1.1`. Update the version in
+   versions to the native library version, for example `1.2.0`. Update the version in
    `README.md`, run `cargo update --workspace`, and commit.
 3. Validate the crates:
    - GitHub: **Actions > Publish to crates.io > Run workflow** with **publish** cleared
    - or locally: `./scripts/release.ps1 -DryRun` (Windows) or `scripts/release.sh --dry-run`
-4. Create a GitHub release with the tag `v<version>`, for example `v1.1.1`. Publishing the
+4. Create a GitHub release with the tag `v<version>`, for example `v1.2.0`. Publishing the
    release runs the workflow; it fails if the tag and the version differ. Locally, the equivalent
    is `./scripts/release.ps1` or `scripts/release.sh`.
 

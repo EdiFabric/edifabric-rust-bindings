@@ -321,9 +321,10 @@ fn demo_teardown() -> ef::Result<()> {
 }
 
 fn run_demos(samples: &Samples, serial: &str) -> ef::Result<()> {
-    // Community authorizes with the serial only. Developer can also use ensure_token, Enterprise set_token.
-    ef::set_serial(serial)?;
-    println!("  set_serial -> ok");
+    // ensure_token licenses the process on every plan: Community and the demo serial are checked online on every
+    // operation, and Developer, Enterprise and Perpetual get a cached token.
+    ef::ensure_token(serial, 3600)?;
+    println!("  ensure_token -> ok");
 
     demo_token_expiration()?;
 
