@@ -2,7 +2,7 @@
 members = ["native/*"]
 
 [workspace.package]
-version = "1.2.0"
+version = "1.2.1"
 edition = "2024"
 rust-version = "1.88"
 homepage = "https://www.edifabric.com/edifabric-native.html"
@@ -36,16 +36,16 @@ bundled = [
 libloading = "0.9.0"
 
 [target.'cfg(all(windows, target_arch = "x86_64"))'.dependencies]
-edifabric-x12-native-win-x64 = { version = "=1.2.0", path = "native/win-x64", optional = true }
+edifabric-x12-native-win-x64 = { version = "=1.2.1", path = "native/win-x64", optional = true }
 
 [target.'cfg(all(target_os = "linux", target_env = "gnu", target_arch = "x86_64"))'.dependencies]
-edifabric-x12-native-linux-x64 = { version = "=1.2.0", path = "native/linux-x64", optional = true }
+edifabric-x12-native-linux-x64 = { version = "=1.2.1", path = "native/linux-x64", optional = true }
 
 [target.'cfg(all(target_os = "linux", target_env = "gnu", target_arch = "aarch64"))'.dependencies]
-edifabric-x12-native-linux-arm64 = { version = "=1.2.0", path = "native/linux-arm64", optional = true }
+edifabric-x12-native-linux-arm64 = { version = "=1.2.1", path = "native/linux-arm64", optional = true }
 
 [target.'cfg(all(target_os = "macos", target_arch = "aarch64"))'.dependencies]
-edifabric-x12-native-osx-arm64 = { version = "=1.2.0", path = "native/osx-arm64", optional = true }
+edifabric-x12-native-osx-arm64 = { version = "=1.2.1", path = "native/osx-arm64", optional = true }
 
 [dev-dependencies]
 serde_json = "1.0.154"
