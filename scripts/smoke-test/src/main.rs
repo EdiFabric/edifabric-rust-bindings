@@ -10,4 +10,10 @@ fn main() {
         loaded.display()
     );
     println!("get_app_version -> {}", edifabric_x12::get_app_version().expect("get_app_version"));
+
+    // The license check uses OpenSSL on Linux, which loading alone doesn't.
+    let serial = std::env::var("EDIFABRIC_SERIAL").ok().filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "bd96a836feca45cb91c86ee65d281f52".to_string());
+    edifabric_x12::ensure_token(&serial, 3600).expect("ensure_token");
+    println!("ensure_token -> ok");
 }

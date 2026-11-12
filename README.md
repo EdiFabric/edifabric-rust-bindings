@@ -32,7 +32,7 @@ precedence over the bundled one. To ship the library yourself and keep about 8 M
 of the program, turn the feature off:
 
 ```toml
-edifabric-x12 = { version = "1.2.1", default-features = false }
+edifabric-x12 = { version = "1.2.2", default-features = false }
 ```
 
 ## Requirements
@@ -100,7 +100,7 @@ Add the crate to your project:
 
 ```toml
 [dependencies]
-edifabric-x12 = "1.2.1"
+edifabric-x12 = "1.2.2"
 ```
 
 ```rust
